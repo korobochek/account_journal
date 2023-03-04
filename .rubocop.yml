@@ -1,0 +1,26 @@
+require:
+  - rubocop-rspec
+
+
+AllCops:
+  EnabledByDefault: true
+  TargetRubyVersion: 3.2
+  Exclude: # temporary
+    - lib/main.rb
+    - spec/main_spec.rb
+
+Lint/ConstantResolution:
+  Enabled: false
+
+Style/Copyright:
+  Enabled: false
+Style/Documentation:
+  Enabled: false
+Style/DocumentationMethod:
+  Enabled: false
+
+
+Bundler/GemVersion:
+  Enabled: false
+Bundler/GemComment:
+  Enabled: false
