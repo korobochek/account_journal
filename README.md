@@ -20,8 +20,8 @@ A list of assumptions made around the solution:
 - For input validation failures - it is sufficient to list them at the end of the application run
 - The application is to be designed to run on the manual basis with an idea to be extended to be run automatically/triggered via a UI upload and/or UI forms
 - No db is required for the first iteration and a closing account balance output is sufficient 
-
-
+- Transactions are to be processed in order they appear in the input file
+- Can only transact between known accounts (ones we have uploaded opening balances for)
 ### Extensions
 
 - Treat money as integers to make sure rounding errors do not impact account balance calculations

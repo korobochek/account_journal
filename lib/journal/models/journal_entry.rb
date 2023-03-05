@@ -10,6 +10,8 @@ module Journal
       @amount = amount
     end
 
+    attr_reader :account, :amount
+
     def amount_for_balance
       case @type
       when :credit
