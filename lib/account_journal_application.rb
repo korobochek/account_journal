@@ -5,10 +5,10 @@ require_relative 'csv_adapter/validators/account_opening_balance_validator'
 require_relative 'csv_adapter/validators/transaction_validator'
 
 module AccountJournalApplication
-  def self.run(account_opening_balances_filename, transactions_filename, account_closing_balances_filename = nil)
+  def self.run(account_opening_balances_filename, transactions_filename, _account_closing_balances_filename = nil)
     validated_opening_balances = parse_opening_balances(account_opening_balances_filename)
     validated_transactions = parse_transactions(transactions_filename)
-    
+    print_validation_errors(validated_opening_balances.select(&:failure?), validated_transactions.select(&:failure?))
   rescue CSVAdapter::FileNotFound => e
     p "ERROR: Unable to parse an input file. #{e.message}"
   end
@@ -29,5 +29,19 @@ module AccountJournalApplication
         CSVAdapter::Validators::TransactionValidator.new.call(from_account: row[0], to_account: row[1], amount: row[3])
       end
     ).parse!
+  end
+
+  def self.print_validation_errors(balance_errors, transaction_errors)
+    return if balance_errors.none? && transaction_errors.none?
+
+    p 'The following errors detected when parsing input files:'
+    print_errors('Failed to load balance', balance_errors)
+    print_errors('Failed to load transaction', transaction_errors)
+  end
+
+  def self.print_errors(prefix, results)
+    results.each do |result|
+      p "#{prefix} for: #{result.to_h.values.join(',')}. Errors detected: #{result.errors.to_h}"
+    end
   end
 end
