@@ -16,6 +16,8 @@ RSpec/FilePath:
   SpecSuffixOnly: true
 RSpec/AlignRightLetBrace:
   Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
 
 Style/Copyright:
   Enabled: false

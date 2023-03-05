@@ -14,11 +14,12 @@ module AccountJournalApplicationRunner
 
     accounts_journal_service = Journal::AccountsJournalService.new
     accounts_journal_service.start_accounting_period(validated_opening_balances.select(&:success?).map(&:to_h))
+    accounts_journal_service.process_transactions(validated_transactions.select(&:success?).map(&:to_h))
   rescue CSVAdapter::FileNotFound => e
     p "ERROR: Unable to parse an input file. #{e.message}"
   end
 
-  def self.parse_opening_balances(account_opening_balances_filename)
+  private_class_method def self.parse_opening_balances(account_opening_balances_filename)
     CSVAdapter::CSVParser.new(
       account_opening_balances_filename,
       lambda do |row|
@@ -27,7 +28,7 @@ module AccountJournalApplicationRunner
     ).parse!
   end
 
-  def self.parse_transactions(transactions_filename)
+  private_class_method def self.parse_transactions(transactions_filename)
     CSVAdapter::CSVParser.new(
       transactions_filename,
       lambda do |row|
@@ -36,7 +37,7 @@ module AccountJournalApplicationRunner
     ).parse!
   end
 
-  def self.print_validation_errors(balance_errors, transaction_errors)
+  private_class_method def self.print_validation_errors(balance_errors, transaction_errors)
     return if balance_errors.none? && transaction_errors.none?
 
     p 'The following errors detected when parsing input files:'
@@ -44,7 +45,7 @@ module AccountJournalApplicationRunner
     print_errors('Failed to load transaction', transaction_errors)
   end
 
-  def self.print_errors(prefix, results)
+  private_class_method def self.print_errors(prefix, results)
     results.each do |result|
       p "#{prefix} for: #{result.to_h.values.join(',')}. Errors detected: #{result.errors.to_h}"
     end
