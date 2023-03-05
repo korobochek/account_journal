@@ -20,7 +20,7 @@ module AccountJournalApplicationRunner
       validated_transactions.select(&:success?),
       account_closing_balances_filename
     )
-  rescue CSVAdapter::FileNotFound => e
+  rescue CSVAdapter::FileNotFoundError => e
     p "ERROR: File does not exist. #{e.message}"
   end
 

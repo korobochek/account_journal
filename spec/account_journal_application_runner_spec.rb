@@ -87,11 +87,11 @@ RSpec.describe(AccountJournalApplicationRunner) do
       expect(writer).to have_received(:write!)
     end
 
-    context 'when CSV Parser raises FileNotFound error' do
+    context 'when CSV Parser raises FileNotFounError error' do
       before do
         csv_parser_stub = instance_double(CSVAdapter::CSVParser)
         allow(CSVAdapter::CSVParser).to receive(:new).and_return(csv_parser_stub)
-        allow(csv_parser_stub).to receive(:parse!).and_raise(CSVAdapter::FileNotFound.new('oops'))
+        allow(csv_parser_stub).to receive(:parse!).and_raise(CSVAdapter::FileNotFoundError.new('oops'))
       end
 
       it 'logs an input file error' do

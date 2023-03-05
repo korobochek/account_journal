@@ -47,7 +47,7 @@ RSpec.describe(CSVAdapter::CSVParser) do
       it 'raises an error' do
         expect do
           described_class.new('not_found.csv', validator_proc).parse!
-        end.to raise_error(CSVAdapter::FileNotFound)
+        end.to raise_error(CSVAdapter::FileNotFoundError)
       end
     end
   end

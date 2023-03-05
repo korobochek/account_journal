@@ -47,6 +47,7 @@ A list of assumptions made around the solution:
 - Use a different way to input data into the application
 - Dockarise the app to ensure it is cross-platform
 - The error output formatting is not ideal - making it better would be a good idea
+- Possible extensions are also to move towards running this on schedule/per transaction/extend to use APIs, etc.
 - many many more :) 
 
 ## Getting started and local development
@@ -91,7 +92,7 @@ $ ./bin/run account_opening_balances_filename transactions_filename (optional)ac
 Tor instance, to run this app against the provided test fixtures (which are checked in for convenience) run the following:
 
 ```bash
-$ ./bin/run spec/fixtures/mable_acc_balance.csv spec/fixtures/mable_trans.csv alpha_sales_account_closing_balances.csv
+$ ./bin/run spec/fixtures/mable_acc_balance.csv spec/fixtures/mable_trans.csv mable_acc_closing_balance.csv
 ```
 
 #### Important notes

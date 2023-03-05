@@ -18,5 +18,5 @@ else
 
   p 'Start'
   AccountJournalApplicationRunner.run(ARGV[0], ARGV[1], ARGV[2])
-  p 'End'
+  p 'Finsihed!'
 end

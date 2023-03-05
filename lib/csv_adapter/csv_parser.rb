@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 require 'csv'
+require_relative 'file_not_found_error'
 
 module CSVAdapter
-  class FileNotFound < StandardError; end
-
   class CSVParser
     attr_reader :filename, :validator_proc
 
@@ -20,7 +19,7 @@ module CSVAdapter
       end
       result
     rescue Errno::ENOENT => e
-      raise(FileNotFound, e.message)
+      raise(CSVAdapter::FileNotFoundError, e.message)
     end
   end
 end
