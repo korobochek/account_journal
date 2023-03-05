@@ -16,7 +16,7 @@ module CSVAdapter
     def parse!
       result = []
       CSV.foreach(filename, headers: false) do |row|
-        result << validator_proc.call(row)
+        result << validator_proc.call(row) unless row.empty?
       end
       result
     rescue Errno::ENOENT => e

@@ -15,7 +15,11 @@ module AccountJournalApplicationRunner
     validated_transactions = parse_transactions(transactions_filename)
     print_validation_errors(validated_opening_balances.select(&:failure?), validated_transactions.select(&:failure?))
 
-    run_account_journal_service(validated_opening_balances, validated_transactions, account_closing_balances_filename)
+    run_account_journal_service(
+      validated_opening_balances.select(&:success?),
+      validated_transactions.select(&:success?),
+      account_closing_balances_filename
+    )
   rescue CSVAdapter::FileNotFound => e
     p "ERROR: File does not exist. #{e.message}"
   end
@@ -40,8 +44,8 @@ module AccountJournalApplicationRunner
 
   private_class_method def self.run_account_journal_service(opening_balances, transactions, closing_balances_filename)
     accounts_journal_service = Journal::AccountsJournal.new
-    accounts_journal_service.start_accounting_period(opening_balances.select(&:success?).map(&:to_h))
-    accounts_journal_service.process_transactions(transactions.select(&:success?).map(&:to_h))
+    accounts_journal_service.start_accounting_period(opening_balances.map(&:to_h))
+    accounts_journal_service.process_transactions(transactions.map(&:to_h))
     save_closing_balances(closing_balances_filename, accounts_journal_service.account_balances)
     print_transaction_processing_failures(accounts_journal_service.list_failed_transactions)
   end

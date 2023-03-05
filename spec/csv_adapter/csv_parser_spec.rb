@@ -16,6 +16,7 @@ RSpec.describe(CSVAdapter::CSVParser) do
       CSV.generate do |csv|
         csv << ['1111234522226789', '5000.00']
         csv << %w[1111234522b test]
+        csv << []
       end
     end
 
