@@ -22,6 +22,11 @@ A list of assumptions made around the solution:
 - No db is required for the first iteration and a closing account balance output is sufficient 
 
 
+### Extensions
+
+- Treat money as integers to make sure rounding errors do not impact account balance calculations
+- Use a different way to input data into the application
+- 
 ## Run
 
 TODO:
@@ -31,6 +36,8 @@ when run and receive errors - a manual intervention is required to either:
 - manually validate a failed transfer - details incorrect? etc?
 
 The system can be re-run multiple times if fixes to input files have been provided. The difference - pick the right output file.
+
+./bin/run spec/fixtures/mable_acc_balance.csv spec/fixtures/mable_trans.csv
 
 ## Getting started and Local Development
 

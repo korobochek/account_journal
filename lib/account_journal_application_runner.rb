@@ -4,11 +4,16 @@ require_relative 'csv_adapter/csv_parser'
 require_relative 'csv_adapter/validators/account_opening_balance_validator'
 require_relative 'csv_adapter/validators/transaction_validator'
 
+require_relative 'journal/accounts_journal_service'
+
 module AccountJournalApplicationRunner
   def self.run(account_opening_balances_filename, transactions_filename, _account_closing_balances_filename = nil)
     validated_opening_balances = parse_opening_balances(account_opening_balances_filename)
     validated_transactions = parse_transactions(transactions_filename)
     print_validation_errors(validated_opening_balances.select(&:failure?), validated_transactions.select(&:failure?))
+
+    accounts_journal_service = Journal::AccountsJournalService.new
+    accounts_journal_service.start_accounting_period(validated_opening_balances.select(&:success?).map(&:to_h))
   rescue CSVAdapter::FileNotFound => e
     p "ERROR: Unable to parse an input file. #{e.message}"
   end
@@ -26,7 +31,7 @@ module AccountJournalApplicationRunner
     CSVAdapter::CSVParser.new(
       transactions_filename,
       lambda do |row|
-        CSVAdapter::Validators::TransactionValidator.new.call(from_account: row[0], to_account: row[1], amount: row[3])
+        CSVAdapter::Validators::TransactionValidator.new.call(from_account: row[0], to_account: row[1], amount: row[2])
       end
     ).parse!
   end

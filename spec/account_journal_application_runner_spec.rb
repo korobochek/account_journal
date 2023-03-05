@@ -5,10 +5,16 @@ RSpec.describe(AccountJournalApplicationRunner) do
     subject(:run_application) { described_class.run(*params) }
 
     let(:params) { ['accounts.csv', 'transactions.csv'] }
+    let(:valid_and_parsed_account_balances) do
+      [
+        { account_number: 1111234522226789, opening_balance: 5000.00 },
+        { account_number: 1212343433335665, opening_balance: 3000.00 }
+      ]
+    end
     let(:account_opening_balances_file) do
       CSV.generate do |csv|
         csv << ['1111234522226789', '5000.00']
-        csv << ['1212343433335665', '5000.00']
+        csv << ['1212343433335665', '3000.00']
         csv << %w[1111234522b test]
       end
     end
@@ -19,8 +25,9 @@ RSpec.describe(AccountJournalApplicationRunner) do
       end
     end
 
+    let(:account_journal_service_double) { instance_double(Journal::AccountsJournalService) }
+
     before do
-      # allow(File).to receive(:open).and_call_original
       allow(File).to receive(:open).with(
         'accounts.csv',
         'r',
@@ -34,12 +41,22 @@ RSpec.describe(AccountJournalApplicationRunner) do
         'r',
         { headers: false, universal_newline: false }
       ).and_return(transactions_file)
+
+      allow(Journal::AccountsJournalService).to receive(:new).and_return(account_journal_service_double)
+      allow(account_journal_service_double).to receive(:start_accounting_period)
     end
 
     it 'displays validation errors' do
       expect do
         run_application
       end.to output(/The following errors detected when parsing input files/).to_stdout
+    end
+
+    it 'starts accounting period using valid opening balances only' do
+      run_application
+      expect(account_journal_service_double).to have_received(:start_accounting_period).with(
+        valid_and_parsed_account_balances
+      )
     end
 
     context 'when CSV Parser raises FileNotFound error' do
