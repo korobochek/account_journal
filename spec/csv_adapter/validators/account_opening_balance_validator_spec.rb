@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe(CSVInputAdapter::Validators::AccountOpeningBalanceValidator) do
+RSpec.describe(CSVAdapter::Validators::AccountOpeningBalanceValidator) do
   describe '#call' do
     subject(:validation_contract_result) do
       described_class.new.call(account_number:, opening_balance:)

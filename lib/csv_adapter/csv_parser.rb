@@ -2,7 +2,7 @@
 
 require 'csv'
 
-module CSVInputAdapter
+module CSVAdapter
   class FileNotFound < StandardError; end
 
   class CSVParser

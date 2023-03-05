@@ -2,7 +2,7 @@
 
 require 'dry-validation'
 
-module CSVInputAdapter
+module CSVAdapter
   module Validators
     class AccountOpeningBalanceValidator < Dry::Validation::Contract
       params do

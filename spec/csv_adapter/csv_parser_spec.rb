@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe(CSVInputAdapter::CSVParser) do
+RSpec.describe(CSVAdapter::CSVParser) do
   describe '#parse!' do
     subject(:parsed_data) do
       described_class.new(filename, validator).parse!
@@ -8,7 +8,7 @@ RSpec.describe(CSVInputAdapter::CSVParser) do
 
     let(:filename) { 'existing_file.csv' }
     let(:validator) do
-      instance_double(CSVInputAdapter::Validators::AccountOpeningBalanceValidator)
+      instance_double(CSVAdapter::Validators::AccountOpeningBalanceValidator)
     end
     let(:file) do
       CSV.generate do |csv|
@@ -45,7 +45,7 @@ RSpec.describe(CSVInputAdapter::CSVParser) do
       it 'raises an error' do
         expect do
           described_class.new('not_found.csv', validator).parse!
-        end.to raise_error(CSVInputAdapter::FileNotFound)
+        end.to raise_error(CSVAdapter::FileNotFound)
       end
     end
   end
