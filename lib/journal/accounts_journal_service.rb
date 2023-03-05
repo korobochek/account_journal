@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative 'models/journal_entry'
+require_relative 'models/transaction'
 
 module Journal
   class InsufficentFundsError < StandardError; end

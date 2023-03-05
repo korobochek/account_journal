@@ -15,5 +15,8 @@ if ARGV.count < 2
     'by default it will be set to \'account_closing_balances.csv\' in the current directory'
 else
   require_relative '../lib/account_journal_application_runner'
+
+  p 'Start'
   AccountJournalApplicationRunner.run(ARGV[0], ARGV[1], ARGV[2])
+  p 'End'
 end

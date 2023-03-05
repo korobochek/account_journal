@@ -4,7 +4,13 @@ RSpec.describe(AccountJournalApplicationRunner) do
   describe '.run' do
     subject(:run_application) { described_class.run(*params) }
 
-    let(:params) { ['accounts.csv', 'transactions.csv'] }
+    let(:params) { ['accounts.csv', 'transactions.csv', 'output.csv'] }
+    let(:expected_closing_balances) do
+      [
+        [1111234522226789, 4500.00],
+        [1212343433335665, 3500.00]
+      ]
+    end
     let(:account_opening_balances_file) do
       CSV.generate do |csv|
         csv << ['1111234522226789', '5000.00']
@@ -46,10 +52,25 @@ RSpec.describe(AccountJournalApplicationRunner) do
         'r',
         { headers: false, universal_newline: false }
       ).and_return(transactions_file)
+      allow(File).to receive(:open).with(
+        'output.csv',
+        'w',
+        { universal_newline: false }
+      ).and_return(instance_double(File, close: nil, '<<' => nil))
+    end
 
-      allow(Journal::AccountsJournalService).to receive(:new).and_return(account_journal_service_double)
-      allow(account_journal_service_double).to receive(:start_accounting_period)
-      allow(account_journal_service_double).to receive(:process_transactions)
+    it 'starts accounting period using valid opening balances only' do
+      expect_any_instance_of(Journal::AccountsJournalService).to receive(:start_accounting_period).with(
+        valid_and_parsed_account_balances
+      )
+      run_application
+    end
+
+    it 'starts processing successfull transactions only' do
+      expect_any_instance_of(Journal::AccountsJournalService).to receive(:process_transactions).with(
+        valid_and_parsed_transactions
+      )
+      run_application
     end
 
     it 'displays validation errors' do
@@ -58,18 +79,12 @@ RSpec.describe(AccountJournalApplicationRunner) do
       end.to output(/The following errors detected when parsing input files/).to_stdout
     end
 
-    it 'starts accounting period using valid opening balances only' do
-      run_application
-      expect(account_journal_service_double).to have_received(:start_accounting_period).with(
-        valid_and_parsed_account_balances
-      )
-    end
+    it 'writes closing balances file' do
+      writer = instance_double(CSVAdapter::CSVWriter, write!: nil)
+      allow(CSVAdapter::CSVWriter).to receive(:new).with('output.csv', expected_closing_balances).and_return(writer)
 
-    it 'starts initiatiated=s processing for successfull transactions only' do
       run_application
-      expect(account_journal_service_double).to have_received(:process_transactions).with(
-        valid_and_parsed_transactions
-      )
+      expect(writer).to have_received(:write!)
     end
 
     context 'when CSV Parser raises FileNotFound error' do
@@ -82,7 +97,7 @@ RSpec.describe(AccountJournalApplicationRunner) do
       it 'logs an input file error' do
         expect do
           run_application
-        end.to output("\"ERROR: Unable to parse an input file. oops\"\n").to_stdout
+        end.to output("\"ERROR: File does not exist. oops\"\n").to_stdout
       end
     end
   end
