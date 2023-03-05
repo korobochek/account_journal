@@ -19,6 +19,9 @@
 require 'simplecov'
 SimpleCov.start
 
+# auto-load all application code to specs
+Dir['lib/**/*.rb'].each { |file| require File.expand_path(file) }
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest

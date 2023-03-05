@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# rubocop styling requires else in this case
+if ARGV.count < 2
+  p 'ERROR: wrong number of parameters provided'
+  p 'Usage:'
+  p '    $ ./bin/run account_opening_balances_filename transactions_filename [account_closing_balances_filename]'
+  p 'Parameters:'
+  p '  account_opening_balances_filename (required) - a csv file containing a list of account ' \
+    'numbers and their opening balances'
+  p '  transactions_filename (required) - a csv file containing a list of transactions to be processed, ' \
+    'containing from account, to account and transaction amount details'
+  p '  account_closing_balances_filename (optional) - a csv filename for the resulting closing balances, ' \
+    'by default it will be set to \'account_closing_balances.csv\' in the current directory'
+else
+  require_relative '../lib/account_journal_application'
+  AccountJournalApplication.run(ARGV[0], ARGV[1], ARGV[2])
+end

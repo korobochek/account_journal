@@ -1,7 +1,6 @@
 require:
   - rubocop-rspec
 
-
 AllCops:
   EnabledByDefault: true
   TargetRubyVersion: 3.2
@@ -12,13 +11,22 @@ AllCops:
 Lint/ConstantResolution:
   Enabled: false
 
+RSpec/FilePath:
+  IgnoreMethods: true
+  SpecSuffixOnly: true
+RSpec/AlignRightLetBrace:
+  Enabled: false
+
 Style/Copyright:
   Enabled: false
 Style/Documentation:
   Enabled: false
 Style/DocumentationMethod:
   Enabled: false
-
+Style/MethodCallWithArgsParentheses:
+  Enabled: false
+Style/NumericLiterals:
+  Enabled: false
 
 Bundler/GemVersion:
   Enabled: false
