@@ -6,17 +6,19 @@ module CSVAdapter
   class FileNotFound < StandardError; end
 
   class CSVParser
-    attr_reader :filename, :validator
+    attr_reader :filename, :validator_proc
 
-    def initialize(filename, validator)
+    def initialize(filename, validator_proc)
       @filename = filename
-      @validator = validator
+      @validator_proc = validator_proc
     end
 
     def parse!
+      result = []
       CSV.foreach(filename, headers: false) do |row|
-        p row
+        result << validator_proc.call(row)
       end
+      result
     rescue Errno::ENOENT => e
       raise(FileNotFound, e.message)
     end

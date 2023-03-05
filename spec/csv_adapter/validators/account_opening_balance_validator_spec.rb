@@ -10,7 +10,7 @@ RSpec.describe(CSVAdapter::Validators::AccountOpeningBalanceValidator) do
     let(:opening_balance) { '500.00' }
 
     it 'passes validation' do
-      expect(validation_contract_result.success?).to eq(true)
+      expect(validation_contract_result.success?).to be(true)
     end
 
     it 'returns parsed data types for an account opening balance' do
@@ -23,7 +23,7 @@ RSpec.describe(CSVAdapter::Validators::AccountOpeningBalanceValidator) do
       let(:account_number)  { 'acc_number_123' }
 
       it 'fails validation' do
-        expect(validation_contract_result.success?).to eq(false)
+        expect(validation_contract_result.success?).to be(false)
       end
 
       it 'returns type validation error for an account_number field' do
@@ -51,7 +51,7 @@ RSpec.describe(CSVAdapter::Validators::AccountOpeningBalanceValidator) do
       let(:opening_balance) { '4' }
 
       it 'passes validation' do
-        expect(validation_contract_result.success?).to eq(true)
+        expect(validation_contract_result.success?).to be(true)
       end
 
       it 'returns opening balance as a float' do
