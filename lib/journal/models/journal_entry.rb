@@ -4,13 +4,13 @@ module Journal
   class UnknownJournalEntryTypeError < StandardError; end
 
   class JournalEntry
-    def initialize(account, type, amount)
-      @account = account
+    def initialize(account_number, type, amount)
+      @account_number = account_number
       @type = type
       @amount = amount
     end
 
-    attr_reader :account, :amount
+    attr_reader :account_number, :amount
 
     def amount_for_balance
       case @type

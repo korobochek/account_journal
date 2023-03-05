@@ -21,7 +21,7 @@ RSpec.describe(Journal::AccountsJournalService) do
       { from_account: 3212343433335755, to_account: 1111234522226789, amount: 320.50 },
       { from_account: 1111234522221333, to_account: 1212343433335665, amount: 25.60 },
       { from_account: 1111234522226789, to_account: 1212343433335665, amount: 5000.00 },
-      { from_account: 1111234522226789, to_account: 1212343433311111, amount: 5000.00 },
+      { from_account: 1111234522226789, to_account: 1212343433311111, amount: 5000.00 }
     ]
   end
 
@@ -39,13 +39,10 @@ RSpec.describe(Journal::AccountsJournalService) do
     end
 
     it 'loads and calculates account balances correctly' do
-      result = opening_balances.map do |balance| 
-        balance[:balance] = balance.delete(:opening_balance)
-        balance
-      end
-      expect(account_journal_service.account_balances).to eq(result)
+      expect(account_journal_service.account_balances).to eq(
+        opening_balances.map { |b| { account_number: b[:account_number], balance: b[:opening_balance] } }
+      )
     end
-
     # TODO: USE CASE: when multiple initial account balances for the same account
   end
 
@@ -64,6 +61,38 @@ RSpec.describe(Journal::AccountsJournalService) do
         { account_number: 3212343433335755, balance: 48679.50 }
       ]
     end
+    let(:failed_txns) do
+      [
+        {
+          from_account: 1111234522221234,
+          to_account: 1212343433335665,
+          amount: 12000.00,
+          status: :failed,
+          failure_reason: 'insufficent funds'
+        },
+        {
+          from_account: 1111234522221333,
+          to_account: 1212343433335665,
+          amount: 25.60,
+          status: :failed,
+          failure_reason: 'unknown source and/or destination accounts'
+        },
+        {
+          from_account: 1111234522226789,
+          to_account: 1212343433335665,
+          amount: 5000.00,
+          status: :failed,
+          failure_reason: 'insufficent funds'
+        },
+        {
+          from_account: 1111234522226789,
+          to_account: 1212343433311111,
+          amount: 5000.00,
+          status: :failed,
+          failure_reason: 'insufficent funds'
+        }
+      ]
+    end
 
     it 'processes valid transactions as appropriate debits and credit that are reflected in account balances' do
       expect(account_journal_service.account_balances).to eq(expected_balances)
@@ -74,14 +103,7 @@ RSpec.describe(Journal::AccountsJournalService) do
     end
 
     it 'allows for failed transaction retrieval with failure reasons' do
-      expect(account_journal_service.list_failed_transactions).to eq(
-        [
-          { from_account: 1111234522221234, to_account: 1212343433335665, amount: 12000.00, status: :failed,  failure_reason: 'insufficent funds' },
-          { from_account: 1111234522221333, to_account: 1212343433335665, amount: 25.60, status: :failed,  failure_reason: 'unknown source and/or destination accounts' },
-          { from_account: 1111234522226789, to_account: 1212343433335665, amount: 5000.00 , status: :failed,  failure_reason: 'insufficent funds' },
-          { from_account: 1111234522226789, to_account: 1212343433311111, amount: 5000.00, status: :failed,  failure_reason: 'unknown source and/or destination accounts' }
-        ]
-      )
+      expect(account_journal_service.list_failed_transactions).to eq(failed_txns)
     end
   end
 end

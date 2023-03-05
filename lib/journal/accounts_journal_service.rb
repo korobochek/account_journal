@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-require_relative 'models/account'
 require_relative 'models/journal_entry'
 
 module Journal
+  class InsufficentFundsError < StandardError; end
+  class UnknownAccountError < StandardError; end
+
   class AccountsJournalService
     def initialize
       # NOTE: I am actively avoding using 'ledger' as a terminology here
@@ -16,44 +18,17 @@ module Journal
 
     def start_accounting_period(accounts_opening_balances)
       accounts_opening_balances.each do |opening_balance_record|
-        # the only reason it exists here is to suppor extension across multiple companies
-        account = Journal::Account.new(opening_balance_record[:account_number])
-        journal_entry = Journal::JournalEntry.new(account, :credit, opening_balance_record[:opening_balance])
+        account_number = opening_balance_record[:account_number]
+        journal_entry = Journal::JournalEntry.new(account_number, :credit, opening_balance_record[:opening_balance])
 
-        # this is looking a bit unnecessary unless you consider account containing the owner entity details
-        accounts_journal[account.account_number] ||= []
-        accounts_journal[account.account_number] << journal_entry
+        accounts_journal[account_number] ||= []
+        accounts_journal[account_number] << journal_entry
       end
     end
 
     def process_transactions(transactions)
       transactions.each do |txn|
-        from_account = Journal::Account.new(txn[:from_account])
-        debit_journal_entry = Journal::JournalEntry.new(from_account, :debit, txn[:amount])
-
-        to_account = Journal::Account.new(txn[:to_account])
-        credit_journal_entry = Journal::JournalEntry.new(to_account, :credit, txn[:amount])
-        
-        transaction_instance = Journal::Transaction.new(debit_journal_entry, credit_journal_entry)
-        
-        from_account_journal_entries = accounts_journal[txn[:from_account]]
-        to_account_journal_entries = accounts_journal[txn[:to_account]]
-
-        if from_account_journal_entries && to_account_journal_entries
-          current_balance = calculate_balance_from_journal_entries(from_account_journal_entries)
-
-          if txn[:amount] <= current_balance
-            accounts_journal[from_account.account_number] << debit_journal_entry
-            accounts_journal[to_account.account_number] << credit_journal_entry
-            transaction_instance.process
-          else
-            transaction_instance.fail('insufficent funds')
-          end
-        else
-          transaction_instance.fail('unknown source and/or destination accounts')
-        end
-
-        @transaction_log << transaction_instance
+        process_transaction(txn)
       end
     end
 
@@ -69,6 +44,40 @@ module Journal
     end
 
     private
+
+    def process_transaction(txn)
+      logged_transaction = build_transaction_to_log(txn[:from_account], txn[:to_account], txn[:amount])
+      process_debit(logged_transaction.debit)
+      process_credit(logged_transaction.credit)
+      logged_transaction.process
+    rescue UnknownAccountError, InsufficentFundsError => e
+      logged_transaction.fail(e.message)
+    ensure
+      @transaction_log << logged_transaction
+    end
+
+    def build_transaction_to_log(from_account, to_account, amount)
+      debit = Journal::JournalEntry.new(from_account, :debit, amount)
+      credit = Journal::JournalEntry.new(to_account, :credit, amount)
+      Journal::Transaction.new(debit, credit)
+    end
+
+    def process_debit(debit)
+      from_account_journal_entries = accounts_journal[debit.account_number]
+      raise UnknownAccountError, 'unknown source and/or destination accounts' unless from_account_journal_entries
+
+      from_account_balance = calculate_balance_from_journal_entries(from_account_journal_entries)
+      raise InsufficentFundsError, 'insufficent funds' if debit.amount > from_account_balance
+
+      accounts_journal[debit.account_number] << debit
+    end
+
+    def process_credit(credit)
+      to_account_journal_entries = accounts_journal[credit.account_number]
+      raise UnknownAccountError, 'unknown source and/or destination accounts' unless to_account_journal_entries
+
+      accounts_journal[credit.account_number] << credit
+    end
 
     def calculate_balance_from_journal_entries(journal_entries)
       journal_entries.sum(&:amount_for_balance)
