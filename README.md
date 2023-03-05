@@ -22,8 +22,6 @@ The design of the system is following basic accounting concepts of a ledger:
 
 The application is designed an an MVP, hence it is a simple command line application at the time, with a design in mind to extend it to suit further development needs.
 
-
-
 ### Solution Assumptions
 
 A list of assumptions made around the solution:
@@ -37,11 +35,16 @@ A list of assumptions made around the solution:
 - No db is required for the first iteration and a closing account balance output is sufficient 
 - Transactions are to be processed in order they appear in the input file
 - Can only transact between known accounts (ones we have uploaded opening balances for)
+- When an account has multiple opening balance entries, it is appropriate to treat them as multiple continuous to an opening balances 
+  - Hence the balance is the sum of opening credits for those accounts
 ### Considered Extensions
 
 - Treat money as integers to make sure rounding errors do not impact account balance calculations
+- use accounts model to support multiple account owners
 - Use a different way to input data into the application
 - Containerize
+- The output formatting is not ideal - making it better would be a good idea
+
 
 ## Getting started and local development
 
@@ -83,4 +86,6 @@ when run and receive errors - a manual intervention is required to either:
 
 The system can be re-run multiple times if fixes to input files have been provided. The difference - pick the right output file.
 
-./bin/run spec/fixtures/mable_acc_balance.csv spec/fixtures/mable_trans.csv
+./bin/run spec/fixtures/mable_acc_balance.csv spec/fixtures/mable_trans.csv alpha_sales_account_closing_balances.csv
+
+running multiple times will overwrite the closing balance file every time

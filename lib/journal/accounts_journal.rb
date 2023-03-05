@@ -7,7 +7,7 @@ module Journal
   class InsufficentFundsError < StandardError; end
   class UnknownAccountError < StandardError; end
 
-  class AccountsJournalService
+  class AccountsJournal
     def initialize
       # NOTE: I am actively avoding using 'ledger' as a terminology here
       # since 'ledger' comes with a large acconting conotations and business logic like balancing sheets and others

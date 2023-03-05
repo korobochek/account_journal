@@ -36,7 +36,7 @@ RSpec.describe(AccountJournalApplicationRunner) do
       ]
     end
 
-    let(:account_journal_service_double) { instance_double(Journal::AccountsJournalService) }
+    let(:account_journal_service_double) { instance_double(Journal::AccountsJournal) }
 
     before do
       allow(File).to receive(:open).with(
@@ -60,14 +60,14 @@ RSpec.describe(AccountJournalApplicationRunner) do
     end
 
     it 'starts accounting period using valid opening balances only' do
-      expect_any_instance_of(Journal::AccountsJournalService).to receive(:start_accounting_period).with(
+      expect_any_instance_of(Journal::AccountsJournal).to receive(:start_accounting_period).with(
         valid_and_parsed_account_balances
       )
       run_application
     end
 
     it 'starts processing successfull transactions only' do
-      expect_any_instance_of(Journal::AccountsJournalService).to receive(:process_transactions).with(
+      expect_any_instance_of(Journal::AccountsJournal).to receive(:process_transactions).with(
         valid_and_parsed_transactions
       )
       run_application

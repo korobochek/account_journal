@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe(Journal::AccountsJournalService) do
+RSpec.describe(Journal::AccountsJournal) do
   subject(:account_journal_service) { described_class.new }
 
   let(:opening_balances) do
@@ -43,7 +43,6 @@ RSpec.describe(Journal::AccountsJournalService) do
         opening_balances.map { |b| { account_number: b[:account_number], balance: b[:opening_balance] } }
       )
     end
-    # TODO: USE CASE: when multiple initial account balances for the same account
   end
 
   describe '#process_transactions' do

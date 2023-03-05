@@ -15,9 +15,9 @@ module Journal
     def amount_for_balance
       case @type
       when :credit
-        @amount
+        amount
       when :debit
-        -@amount
+        -amount
       else
         raise UnknownJournalEntryTypeError, @type
       end

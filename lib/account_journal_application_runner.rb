@@ -7,7 +7,7 @@ require_relative 'csv_adapter/csv_writer'
 require_relative 'csv_adapter/validators/account_opening_balance_validator'
 require_relative 'csv_adapter/validators/transaction_validator'
 
-require_relative 'journal/accounts_journal_service'
+require_relative 'journal/accounts_journal'
 
 module AccountJournalApplicationRunner
   def self.run(account_opening_balances_filename, transactions_filename, account_closing_balances_filename = nil)
@@ -39,7 +39,7 @@ module AccountJournalApplicationRunner
   end
 
   private_class_method def self.run_account_journal_service(opening_balances, transactions, closing_balances_filename)
-    accounts_journal_service = Journal::AccountsJournalService.new
+    accounts_journal_service = Journal::AccountsJournal.new
     accounts_journal_service.start_accounting_period(opening_balances.select(&:success?).map(&:to_h))
     accounts_journal_service.process_transactions(transactions.select(&:success?).map(&:to_h))
     save_closing_balances(closing_balances_filename, accounts_journal_service.account_balances)
