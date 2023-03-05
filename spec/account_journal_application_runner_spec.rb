@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe(AccountJournalApplication) do
+RSpec.describe(AccountJournalApplicationRunner) do
   describe '.run' do
     subject(:run_application) { described_class.run(*params) }
 

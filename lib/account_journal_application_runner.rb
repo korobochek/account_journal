@@ -4,7 +4,7 @@ require_relative 'csv_adapter/csv_parser'
 require_relative 'csv_adapter/validators/account_opening_balance_validator'
 require_relative 'csv_adapter/validators/transaction_validator'
 
-module AccountJournalApplication
+module AccountJournalApplicationRunner
   def self.run(account_opening_balances_filename, transactions_filename, _account_closing_balances_filename = nil)
     validated_opening_balances = parse_opening_balances(account_opening_balances_filename)
     validated_transactions = parse_transactions(transactions_filename)
