@@ -27,6 +27,8 @@ Style/MethodCallWithArgsParentheses:
   Enabled: false
 Style/NumericLiterals:
   Enabled: false
+Style/MethodCalledOnDoEndBlock:
+  Enabled: false
 
 Bundler/GemVersion:
   Enabled: false
